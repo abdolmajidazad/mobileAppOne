@@ -16,7 +16,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon from "react-native-vector-icons/FontAwesome";
 import styles from "./Styles";
 import logo from "./assets/images/logo.png";
 import ship from "./assets/images/ship.jpeg";
@@ -43,6 +43,7 @@ export default class App extends Component {
                 }).then(res => res.json())
                   .catch(error => error)
                   .then(list => {
+                      console.log('list', list);
                       this.setState({ list, loading: false }, () => {
                           this.setModalVisible(true);
                       });
@@ -70,27 +71,39 @@ export default class App extends Component {
     };
 
     generateText = array => {
-        return array.map(item => {
+        return array.map((item, index) => {
             if( item === '**Result**' ) {
                 return (
-                    <Text style={{ fontWeight: 'bold' }}> {this.state.text} </Text>)
+                    <Text key={index} style={{ fontWeight: 'bold' }}> {this.state.text} </Text>)
             } else {
                 return (
-                    item
+                    <Text key={index}>{item}</Text>
                 )
             }
         })
+    };
+
+    getIconName = icon => {
+        switch (icon) {
+            case 'map-marker-alt':
+                return 'map-marker';
+            case 'dollar-sign':
+                return 'dollar';
+            default:
+                return icon
+        }
     };
 
     itemLoader = item => {
 
         let normalText = item.text.split(',').join(' , ');
         let newText = normalText.split(' ');
+        let icon = this.getIconName(item.icon);
 
         return (
             <TouchableOpacity style={styles.listItems} onPress={() => this.setLocation(item)}>
                 <View style={{ flex: 1 }}>
-                    <Icon name="location-on" size={25} color="#52a786"/>
+                    <Icon name={icon} size={25} color="#52a786"/>
                 </View>
                 <View style={{ flex: 8 }}>
                     <Text style={{ textAlign: 'left' }}>
@@ -145,7 +158,7 @@ export default class App extends Component {
                     </TouchableOpacity>
                     <View style={styles.modalHorizontalDivider}/>
                     <View style={styles.modalHeader}>
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                             <View style={styles.container}>
                                 <TouchableOpacity
                                     style={[ styles.button, styles.buttonSelected ]}
@@ -194,7 +207,7 @@ export default class App extends Component {
                     <View style={styles.centerItem}>
                         <Image style={styles.logo} source={logo}/>
                     </View>
-                    <View style={styles.centerItem}>
+                    <View style={[styles.centerItem, {flex:1}]}>
                         <TextInput
                             onChangeText={( text ) => this.search(text) }
                             placeholder='Start Typing'
@@ -207,8 +220,8 @@ export default class App extends Component {
                         <TouchableHighlight>
                             <Icon name="search" size={30} color="#52a786"/>
                         </TouchableHighlight>
-                        <TouchableHighlight>
-                            <Icon name="menu" size={30}/>
+                        <TouchableHighlight style={{marginLeft: 20}}>
+                            <Icon name="bars" size={30}/>
                         </TouchableHighlight>
                     </View>
                 </View>
